@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Senior Backend Engineer",
+    "team": "Engineering",
+    "location": "Nairobi or remote",
+    "type": "Full time",
+    "salary": "KES 450k–650k / month",
+    "description": [
+      "Design and build APIs, integrations and data pipelines for clients in finance and logistics. You will lead technical decisions on projects of three to six people.",
+      "We are looking for 5+ years with Node.js or Python, solid PostgreSQL, and experience running production systems on AWS or Azure."
+    ],
+    "open": true
+  },
+  {
+    "title": "Frontend Engineer",
+    "team": "Engineering",
+    "location": "Nairobi, hybrid",
+    "type": "Full time",
+    "salary": "KES 300k–450k / month",
+    "description": [
+      "Build fast, accessible interfaces in React and Next.js, working closely with our designers from the first prototype to production.",
+      "3+ years with TypeScript and React. You care about performance budgets and keyboard users."
+    ],
+    "open": true
+  },
+  {
+    "title": "Cloud and DevOps Engineer",
+    "team": "Infrastructure",
+    "location": "Remote, EAT ±3h",
+    "type": "Full time",
+    "salary": "KES 400k–600k / month",
+    "description": [
+      "Plan and run cloud migrations, write Terraform, and set up the CI/CD pipelines our project teams rely on.",
+      "Hands-on AWS or Azure, Terraform, Docker, and at least one migration you can talk us through in detail."
+    ],
+    "open": true
+  },
+  {
+    "title": "Product Designer",
+    "team": "Design",
+    "location": "Nairobi, hybrid",
+    "type": "Full time",
+    "salary": "KES 280k–420k / month",
+    "description": [
+      "Run discovery workshops, user interviews and usability tests, then turn what you learn into prototypes and production-ready interfaces.",
+      "A portfolio that shows your process, not only final screens. Experience with complex internal tools is a plus."
+    ],
+    "open": true
+  }
+]
