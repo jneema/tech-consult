@@ -1,0 +1,62 @@
+[
+  {
+    "id": "software",
+    "name": "Software development",
+    "short": "Software",
+    "summary": "Custom platforms, internal tools and mobile apps built around how your business actually runs.",
+    "nodes": [
+      "tools",
+      "mobile",
+      "erp"
+    ],
+    "note": "Custom software replaces the spreadsheets and manual steps between your internal tools, mobile teams and finance."
+  },
+  {
+    "id": "web",
+    "name": "Web development",
+    "short": "Web",
+    "summary": "Fast, accessible websites, customer portals and web apps your team can update without a developer.",
+    "nodes": [
+      "web",
+      "cloud"
+    ],
+    "note": "Web development covers the public face of your business and the hosting that keeps it fast."
+  },
+  {
+    "id": "integrations",
+    "name": "Integrations",
+    "short": "Integrations",
+    "summary": "Connect payments, CRM, accounting and logistics so data moves once, correctly, without retyping.",
+    "nodes": [
+      "crm",
+      "pay",
+      "erp",
+      "data"
+    ],
+    "note": "Integrations link the tools you already pay for, so a sale in your CRM shows up in accounting and reporting on its own."
+  },
+  {
+    "id": "cloud",
+    "name": "Cloud solutions",
+    "short": "Cloud",
+    "summary": "Migrate off ageing servers, cut hosting costs and ship new releases without holding your breath.",
+    "nodes": [
+      "cloud",
+      "data",
+      "web"
+    ],
+    "note": "Cloud work sits underneath everything: hosting, storage, backups and how new versions reach production."
+  },
+  {
+    "id": "more",
+    "name": "More services",
+    "short": "Design & data",
+    "summary": "Product design, data and reporting, IT strategy and audits, and long-term support for live systems.",
+    "nodes": [
+      "data",
+      "tools",
+      "mobile"
+    ],
+    "note": "Design and data work makes the rest usable: interfaces your staff like, and dashboards managers actually open."
+  }
+]
