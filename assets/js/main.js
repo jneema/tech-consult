@@ -64,7 +64,30 @@
         <span class="link-arrow">Read the case study ${ARROW}</span>
       </div></a>`;
 
-  window.Corbel = { $, $$, store, esc, toast, reduced, ARROW, caseCard, serviceName };
+  /* ---------- Form submissions ----------
+     Served by server.py, forms post to /api/submit/<kind>. Opened straight from disk
+     (file://) there is no server, so submissions are only kept in this browser. */
+  const online = location.protocol.startsWith('http');
+  async function submit(kind, payload) {
+    if (!online) {
+      const key = 'corbel-' + kind + 's';
+      const all = store.get(key, []);
+      all.push(payload);
+      store.set(key, all);
+      return { ok: true, ref: payload.ref, offline: true };
+    }
+    try {
+      const res = await fetch('/api/submit/' + kind, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      return { ok: res.ok, status: res.status, ref: data.ref || payload.ref, error: data.error };
+    } catch (e) {
+      return { ok: false, status: 0, error: 'We could not reach the server. Check your connection, or email hello@corbel.example.' };
+    }
+  }
+
+  window.Corbel = { $, $$, store, esc, toast, reduced, ARROW, caseCard, serviceName, submit, online };
 
   /* ---------- Theme ---------- */
   $$('[data-theme-toggle]').forEach(btn => btn.addEventListener('click', () => {
@@ -131,10 +154,14 @@
         input.focus();
         return;
       }
-      const list = store.get('corbel-newsletter', []);
-      if (!list.includes(v)) { list.push(v); store.set('corbel-newsletter', list); }
-      form.reset();
-      msg.textContent = `Thanks. The next issue goes to ${v}.`;
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      submit('newsletter', { email: v }).then(r => {
+        btn.disabled = false;
+        if (!r.ok) { msg.textContent = r.error || 'Something went wrong. Please try again.'; return; }
+        form.reset();
+        msg.textContent = `Thanks. The next issue goes to ${v}.`;
+      });
     });
   });
 
