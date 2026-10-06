@@ -158,13 +158,14 @@
   const days = [];
   { const d = new Date(); d.setHours(0, 0, 0, 0); while (days.length < 10) { d.setDate(d.getDate() + 1); if (d.getDay() % 6 !== 0) days.push(new Date(d)); } }
   const toUTC = (d, t) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), +t.slice(0, 2) - 3, 0));
-  // With the server running, booked slots come from /api/slots. Opened from disk, a fixed demo pattern is shown.
+  // With server.py running, booked slots come from /api/slots. Without it, a fixed demo pattern is shown.
   let booked = null;
   const taken = (d, t) => booked ? booked.has(toUTC(d, t).toISOString()) : ((d.getDate() * 7 + TIMES.indexOf(t) * 13) % 5) === 0;
   async function loadSlots() {
     if (!online) return;
     try {
       const res = await fetch('/api/slots');
+      if (!(res.headers.get('Content-Type') || '').includes('json')) return;   // static host: keep the demo pattern
       booked = new Set((await res.json()).taken);
       if (selTime && taken(days[selDay], selTime)) selTime = null;
       renderSlots();
