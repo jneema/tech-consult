@@ -1,6 +1,6 @@
 /* Corbel — contact page: tabs, multi-step brief, call booking with calendar file. */
 (function () {
-  const { $, $$, store, esc, toast, reduced } = window.Corbel;
+  const { $, $$, store, esc, toast, reduced, submit, online } = window.Corbel;
   const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const makeRef = () => 'CRB-' + (1000 + Math.floor(Math.random() * 9000));
   const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -121,7 +121,7 @@
   }
   if (notes.length) $('#bMessage').value = notes.join('\n') + '\n\n';
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     if (!validStep(3)) return;
     const data = new FormData(form);
@@ -133,10 +133,12 @@
       phone: data.get('phone').trim(), message: data.get('message').trim(), source: data.get('source'),
       nda: !!data.get('nda'), created: new Date().toISOString()
     };
-    // Prototype: kept in the browser. Replace with a POST to your CRM or form endpoint.
-    const all = store.get('corbel-briefs', []);
-    all.push(brief);
-    store.set('corbel-briefs', all);
+    const sendBtn = $('#briefSubmit');
+    sendBtn.disabled = true;
+    const res = await submit('brief', { ...brief, website: form.elements.website.value });
+    sendBtn.disabled = false;
+    if (!res.ok) { toast(res.error || 'Something went wrong. Please try again.'); return; }
+    brief.ref = res.ref;
 
     $('#panel-brief').innerHTML = `<div class="success" tabindex="-1" id="briefDone">
         <div class="tick">${TICK}</div>
@@ -155,8 +157,19 @@
   const TIMES = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
   const days = [];
   { const d = new Date(); d.setHours(0, 0, 0, 0); while (days.length < 10) { d.setDate(d.getDate() + 1); if (d.getDay() % 6 !== 0) days.push(new Date(d)); } }
-  const taken = (d, t) => ((d.getDate() * 7 + TIMES.indexOf(t) * 13) % 5) === 0;
   const toUTC = (d, t) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), +t.slice(0, 2) - 3, 0));
+  // With the server running, booked slots come from /api/slots. Opened from disk, a fixed demo pattern is shown.
+  let booked = null;
+  const taken = (d, t) => booked ? booked.has(toUTC(d, t).toISOString()) : ((d.getDate() * 7 + TIMES.indexOf(t) * 13) % 5) === 0;
+  async function loadSlots() {
+    if (!online) return;
+    try {
+      const res = await fetch('/api/slots');
+      booked = new Set((await res.json()).taken);
+      if (selTime && taken(days[selDay], selTime)) selTime = null;
+      renderSlots();
+    } catch (e) { /* keep showing every slot; the server re-checks on booking */ }
+  }
   const local = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
   const longDay = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
   const shortDay = new Intl.DateTimeFormat('en-GB', { weekday: 'short' });
@@ -191,6 +204,7 @@
     slotsEl.querySelector(`[data-t="${selTime}"]`).focus();
   });
   renderSlots();
+  loadSlots();
 
   const SVC_TOPIC = { software: 'Software development', web: 'Web development', integrations: 'Integrations', cloud: 'Cloud solutions', more: 'Design, data or support' };
   if (SVC_TOPIC[params.get('service')]) $('#cTopic').value = SVC_TOPIC[params.get('service')];
@@ -205,7 +219,7 @@
       'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   }
 
-  $('#callForm').addEventListener('submit', e => {
+  $('#callForm').addEventListener('submit', async e => {
     e.preventDefault();
     const ok = [
       check($('#cName'), $('#cName').value.trim().length > 1, 'Enter your name.'),
@@ -224,9 +238,13 @@
       ref: makeRef(), name: $('#cName').value.trim(), email: $('#cEmail').value.trim(), topic: $('#cTopic').value,
       when: `${longDay.format(d)} at ${selTime} EAT`, startUTC: toUTC(d, selTime).toISOString(), created: new Date().toISOString()
     };
-    const all = store.get('corbel-calls', []);
-    all.push(rec);
-    store.set('corbel-calls', all);
+    const bookBtn = $('#callForm button[type=submit]');
+    bookBtn.disabled = true;
+    const res = await submit('call', { ...rec, website: $('#callForm').elements.website.value });
+    bookBtn.disabled = false;
+    if (res.status === 409) { toast(res.error); await loadSlots(); return; }
+    if (!res.ok) { toast(res.error || 'Something went wrong. Please try again.'); return; }
+    rec.ref = res.ref;
 
     $('#panel-call').innerHTML = `<div class="success" tabindex="-1" id="callDone">
         <div class="tick">${TICK}</div>
