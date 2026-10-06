@@ -21,12 +21,15 @@
     <a class="brand" href="../index.html"><svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 4h22v6H14v14H8V10H3z" fill="currentColor"/><rect x="16" y="13" width="9" height="11" fill="var(--accent)"/></svg><span>Corbel</span></a>
     <h1>Sign in to admin</h1>
     <div class="field">
+      <label for="username">Username</label>
+      <input id="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+    </div>
+    <div class="field">
       <label for="password">Password</label>
       <input id="password" type="password" autocomplete="current-password" required>
       <span class="err" id="loginErr" role="alert"></span>
     </div>
     <button class="btn btn-primary btn-block" type="submit">Sign in</button>
-    <p class="muted small">The password is printed when <code>server.py</code> first starts, or set with <code>CORBEL_ADMIN_PASSWORD</code>.</p>
   </form>
 </main>
 
