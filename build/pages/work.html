@@ -1,0 +1,44 @@
+<header class="page-head">
+  <div class="container page-head-grid">
+    <div>
+      <p class="label">Case studies</p>
+      <h1 class="h1">Work we can talk about.</h1>
+    </div>
+    <p class="lede">Most of our projects are under NDA. These clients agreed to share the problem, what we built and the results they measured.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="filter-bar">
+      <div class="chips" id="svcFilter" role="group" aria-label="Filter by service"></div>
+      <div>
+        <label class="sr-only" for="indFilter">Industry</label>
+        <select class="select" id="indFilter"><option value="all">All industries</option></select>
+      </div>
+    </div>
+    <p class="result-count" id="resultCount" aria-live="polite"></p>
+    <div class="case-grid" id="caseGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container cta-block">
+    <div>
+      <h2 class="h2">Working on something similar?</h2>
+      <p class="note">We are happy to share more detail on any of these projects, and introduce you to the client where they have agreed to it.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-accent" href="contact.html">Start a project {{icon:arrow}}</a>
+      <a class="btn btn-outline" href="contact.html#call">Book a call</a>
+    </div>
+  </div>
+</section>
+
+<dialog class="case-dialog" id="caseDialog" aria-labelledby="caseTitle">
+  <div class="dialog-head">
+    <span id="caseKicker"></span>
+    <button class="icon-btn" type="button" id="caseClose" aria-label="Close case study">{{icon:x}}</button>
+  </div>
+  <div class="dialog-body" id="caseBody"></div>
+</dialog>

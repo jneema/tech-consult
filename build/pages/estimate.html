@@ -1,0 +1,57 @@
+<header class="page-head">
+  <div class="container page-head-grid">
+    <div>
+      <p class="label">Estimator</p>
+      <h1 class="h1">Estimate your project.</h1>
+    </div>
+    <p class="lede">A rough budget, timeline and team size in under a minute, based on what similar projects have cost. A lead will refine it with you on a call.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="estimator">
+      <form class="est-form" id="estForm" onsubmit="return false">
+        <fieldset>
+          <legend>What are you building?</legend>
+          <p class="hint">Choose the main piece of work. You can add more later.</p>
+          <div class="options" id="estType"></div>
+        </fieldset>
+        <fieldset>
+          <legend>How big is it?</legend>
+          <p class="hint">Think in screens, user roles and business rules.</p>
+          <div class="options" id="estSize"></div>
+        </fieldset>
+        <fieldset>
+          <legend><label for="estInt">Third-party systems to connect</label></legend>
+          <p class="hint">Payment providers, CRMs, accounting software, SMS gateways and similar.</p>
+          <div class="range-row">
+            <input type="range" id="estInt" min="0" max="8" value="2">
+            <output id="estIntVal" for="estInt">2 systems</output>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Also include</legend>
+          <div class="options" id="estExtras"></div>
+        </fieldset>
+        <fieldset style="margin-bottom:0">
+          <legend>Timeline</legend>
+          <div class="options" id="estPace"></div>
+        </fieldset>
+      </form>
+
+      <aside class="est-summary" aria-live="polite" aria-label="Estimate">
+        <p class="k">Estimated budget</p>
+        <p class="total" id="sumCost">–</p>
+        <div class="pair">
+          <div><span class="k">Delivery</span><b id="sumWeeks">–</b></div>
+          <div><span class="k">Team</span><b id="sumTeam">–</b></div>
+        </div>
+        <ul class="est-lines" id="sumLines"></ul>
+        <a class="btn btn-accent btn-block" href="contact.html" id="estSend">Send this estimate to a lead {{icon:arrow}}</a>
+        <p class="fine">Ranges exclude hosting and third-party licence fees. Final pricing follows a free discovery call.</p>
+      </aside>
+    </div>
+  
+  </div>
+</section>

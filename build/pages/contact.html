@@ -1,0 +1,143 @@
+<header class="page-head">
+  <div class="container page-head-grid">
+    <div>
+      <p class="label">Contact</p>
+      <h1 class="h1">Tell us what you're building.</h1>
+    </div>
+    <p class="lede">Send a short brief or book a call. Either way, you'll hear back from a technical lead, not a salesperson, within one business day.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container contact-layout">
+    <aside class="contact-aside">
+      <div>
+        <h2>Email</h2>
+        <a class="big-link" href="mailto:hello@corbel.example">hello@corbel.example</a>
+      </div>
+      <div>
+        <h2>Phone</h2>
+        <a class="big-link" href="tel:+254207654321">+254 20 765 4321</a>
+        <p class="muted small" style="margin-top:6px">Monday to Friday, 8am to 6pm EAT</p>
+      </div>
+      <div>
+        <h2>Studio</h2>
+        <p>4th Floor, The Mirage<br>Waiyaki Way, Westlands<br>Nairobi, Kenya</p>
+      </div>
+      <div>
+        <h2>What happens next</h2>
+        <ol class="next-steps">
+          <li>A technical lead reads your brief and replies within one business day.</li>
+          <li>A 30-minute call to understand the problem. We can sign an NDA first.</li>
+          <li>A written proposal with scope, timeline and a fixed price for discovery.</li>
+        </ol>
+      </div>
+    </aside>
+
+    <div class="panel">
+      <div class="tabs" role="tablist" aria-label="How would you like to get in touch?">
+        <button class="tab" role="tab" id="tab-brief" aria-controls="panel-brief" aria-selected="true">Send a project brief</button>
+        <button class="tab" role="tab" id="tab-call" aria-controls="panel-call" aria-selected="false" tabindex="-1">Book a call</button>
+      </div>
+
+      <!-- Brief -->
+      <div class="tab-panel" role="tabpanel" id="panel-brief" aria-labelledby="tab-brief">
+        <form id="briefForm" novalidate>
+          <div class="progress" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
+          <div class="step-meta"><span id="stepName">Your project</span><span id="stepCount">Step 1 of 3</span></div>
+
+          <div class="form-step" data-step="1">
+            <h3>What do you need help with?</h3>
+            <p class="hint">Select everything that applies.</p>
+            <fieldset>
+              <legend class="sr-only">Services</legend>
+              <div class="options" id="briefServices">
+                <label class="option"><input type="checkbox" name="services" value="Software development"><span><b>Software development</b><small>Platforms, internal tools, mobile</small></span></label>
+                <label class="option"><input type="checkbox" name="services" value="Web development"><span><b>Web development</b><small>Websites, portals, e-commerce</small></span></label>
+                <label class="option"><input type="checkbox" name="services" value="Integrations"><span><b>Integrations</b><small>Payments, CRM, ERP, APIs</small></span></label>
+                <label class="option"><input type="checkbox" name="services" value="Cloud solutions"><span><b>Cloud solutions</b><small>Migration, DevOps, cost</small></span></label>
+                <label class="option"><input type="checkbox" name="services" value="Design or data"><span><b>Design or data</b><small>UX, dashboards, reporting</small></span></label>
+                <label class="option"><input type="checkbox" name="services" value="Consulting or support"><span><b>Consulting or support</b><small>Audits, strategy, maintenance</small></span></label>
+              </div>
+              <p class="group-error" id="servicesErr"></p>
+            </fieldset>
+            <fieldset>
+              <legend>Where are you starting from?</legend>
+              <div class="options">
+                <label class="option"><input type="radio" name="stage" value="New build" checked><span><b>New build</b><small>Nothing exists yet</small></span></label>
+                <label class="option"><input type="radio" name="stage" value="Existing system"><span><b>Existing system</b><small>Improve or replace it</small></span></label>
+                <label class="option"><input type="radio" name="stage" value="Not sure"><span><b>Not sure yet</b><small>Help us work it out</small></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="form-step" data-step="2" hidden>
+            <h3>Budget and timing</h3>
+            <p class="hint">A rough range helps us suggest the right approach. It is not a commitment.</p>
+            <fieldset>
+              <legend>Budget</legend>
+              <div class="options" id="budgetOpts">
+                <label class="option"><input type="radio" name="budget" value="u10"><span><b>Under $10k</b></span></label>
+                <label class="option"><input type="radio" name="budget" value="10-25"><span><b>$10k – $25k</b></span></label>
+                <label class="option"><input type="radio" name="budget" value="25-50"><span><b>$25k – $50k</b></span></label>
+                <label class="option"><input type="radio" name="budget" value="50-100"><span><b>$50k – $100k</b></span></label>
+                <label class="option"><input type="radio" name="budget" value="100+"><span><b>$100k+</b></span></label>
+                <label class="option"><input type="radio" name="budget" value="unsure"><span><b>Not sure yet</b></span></label>
+              </div>
+              <p class="group-error" id="budgetErr"></p>
+            </fieldset>
+            <fieldset>
+              <legend>When would you like to start?</legend>
+              <div class="options">
+                <label class="option"><input type="radio" name="timing" value="As soon as possible"><span><b>As soon as possible</b></span></label>
+                <label class="option"><input type="radio" name="timing" value="In 1 to 3 months" checked><span><b>In 1 to 3 months</b></span></label>
+                <label class="option"><input type="radio" name="timing" value="In 3 to 6 months"><span><b>In 3 to 6 months</b></span></label>
+                <label class="option"><input type="radio" name="timing" value="Just exploring"><span><b>Just exploring</b></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="form-step" data-step="3" hidden>
+            <h3>About you</h3>
+            <p class="hint">We only use these details to reply to you.</p>
+            <div class="fields">
+              <div class="field"><label for="bName">Full name</label><input id="bName" name="name" autocomplete="name"><span class="err"></span></div>
+              <div class="field"><label for="bEmail">Work email</label><input id="bEmail" name="email" type="email" autocomplete="email"><span class="err"></span></div>
+              <div class="field"><label for="bCompany">Company <span class="opt">(optional)</span></label><input id="bCompany" name="company" autocomplete="organization"><span class="err"></span></div>
+              <div class="field"><label for="bPhone">Phone <span class="opt">(optional)</span></label><input id="bPhone" name="phone" type="tel" autocomplete="tel"><span class="err"></span></div>
+              <div class="field full"><label for="bMessage">Tell us about the project</label><textarea id="bMessage" name="message" placeholder="What problem are you solving, who uses it, and what systems are involved?"></textarea><span class="err"></span></div>
+              <div class="field full"><label for="bSource">How did you hear about us? <span class="opt">(optional)</span></label>
+                <select id="bSource" name="source"><option value="">Select one</option><option>Referral from a client</option><option>Search engine</option><option>LinkedIn</option><option>Event or talk</option><option>Other</option></select></div>
+              <label class="checkbox" for="bNda"><input type="checkbox" id="bNda" name="nda"> Send me a mutual NDA before we talk</label>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-outline" type="button" id="briefBack" hidden>Back</button>
+            <button class="btn btn-primary" type="button" id="briefNext">Continue {{icon:arrow}}</button>
+            <button class="btn btn-accent" type="submit" id="briefSubmit" hidden>Send brief</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Call -->
+      <div class="tab-panel" role="tabpanel" id="panel-call" aria-labelledby="tab-call" hidden>
+        <form id="callForm" novalidate>
+          <p class="sub-label">1. Choose a day</p>
+          <div class="days" id="days" role="group" aria-label="Available days"></div>
+          <p class="sub-label">2. Choose a time <span>East Africa Time (GMT+3)<span id="localHint"></span></span></p>
+          <div class="slots" id="slots" role="group" aria-label="Available times"></div>
+          <p class="picked" id="picked">No time selected yet.</p>
+          <p class="sub-label">3. Your details</p>
+          <div class="fields">
+            <div class="field"><label for="cName">Full name</label><input id="cName" autocomplete="name"><span class="err"></span></div>
+            <div class="field"><label for="cEmail">Work email</label><input id="cEmail" type="email" autocomplete="email"><span class="err"></span></div>
+            <div class="field full"><label for="cTopic">What would you like to discuss?</label>
+              <select id="cTopic"><option value="">Select a topic</option><option>Software development</option><option>Web development</option><option>Integrations</option><option>Cloud solutions</option><option>Design, data or support</option><option>Something else</option></select><span class="err"></span></div>
+          </div>
+          <div class="form-nav"><button class="btn btn-accent" type="submit">Book call {{icon:arrow}}</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
