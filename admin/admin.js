@@ -44,6 +44,9 @@
       headers: { 'Content-Type': 'application/json', 'X-Corbel-Admin': '1' },
       body: body === undefined ? undefined : JSON.stringify(body)
     });
+    if (!(res.headers.get('Content-Type') || '').includes('json')) {
+      throw new Error('The admin only works when the site is run with server.py. This copy is static files only.');
+    }
     const data = await res.json().catch(() => ({}));
     if (res.status === 401 && path !== '/api/login') { showLogin(); throw new Error('Your session has ended. Please sign in again.'); }
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status}).`);
