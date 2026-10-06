@@ -65,21 +65,24 @@
       </div></a>`;
 
   /* ---------- Form submissions ----------
-     Served by server.py, forms post to /api/submit/<kind>. Opened straight from disk
-     (file://) there is no server, so submissions are only kept in this browser. */
-  const online = location.protocol.startsWith('http');
+     Served by server.py, forms post to /api/submit/<kind>. Without that server (opened from
+     disk, or on a static host such as GitHub Pages) submissions are only kept in this browser. */
+  const online = location.protocol.startsWith('http');   // a server *may* be present
+  function saveLocally(kind, payload) {
+    const key = 'corbel-' + kind + 's';
+    const all = store.get(key, []);
+    all.push(payload);
+    store.set(key, all);
+    return { ok: true, ref: payload.ref, offline: true };
+  }
   async function submit(kind, payload) {
-    if (!online) {
-      const key = 'corbel-' + kind + 's';
-      const all = store.get(key, []);
-      all.push(payload);
-      store.set(key, all);
-      return { ok: true, ref: payload.ref, offline: true };
-    }
+    if (!online) return saveLocally(kind, payload);
     try {
       const res = await fetch('/api/submit/' + kind, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
+      // A static host answers with an HTML error page rather than our JSON: there is no server
+      if (!(res.headers.get('Content-Type') || '').includes('json')) return saveLocally(kind, payload);
       const data = await res.json().catch(() => ({}));
       return { ok: res.ok, status: res.status, ref: data.ref || payload.ref, error: data.error };
     } catch (e) {
