@@ -17,6 +17,13 @@
   --accent-text: #0B6447;
   --accent-soft: #E3F1EB;
   --on-accent: #FFFFFF;
+  --tint: #EEF4F0;
+  --grid: rgba(14, 107, 78, .08);
+  --deep: #0B3D2E;
+  --deep-ink: #F1F7F4;
+  --deep-muted: #A9C9BB;
+  --deep-line: #1D5442;
+  --mint: #8BE3BD;
   --band: #0B1220;
   --band-ink: #F1F4F7;
   --band-muted: #98A2AF;
@@ -53,6 +60,13 @@
     --band-line: #222A35;
     --ok: #3DB386;
     --err: #F07467;
+    --tint: #0E1318;
+    --grid: rgba(255, 255, 255, .035);
+    --deep: #0D2A21;
+    --deep-ink: #E8EBEF;
+    --deep-muted: #93B3A5;
+    --deep-line: #1D3F33;
+    --mint: #4CC79A;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px -16px rgba(0, 0, 0, .6);
     color-scheme: dark;
   }
@@ -75,6 +89,13 @@
   --band-line: #222A35;
   --ok: #3DB386;
   --err: #F07467;
+  --tint: #0E1318;
+  --grid: rgba(255, 255, 255, .035);
+  --deep: #0D2A21;
+  --deep-ink: #E8EBEF;
+  --deep-muted: #93B3A5;
+  --deep-line: #1D3F33;
+  --mint: #4CC79A;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px -16px rgba(0, 0, 0, .6);
   color-scheme: dark;
 }
@@ -987,3 +1008,58 @@ body.dialog-open { overflow: hidden; }
 .pager-link:hover .pager-t { color: var(--accent-text); }
 .pager-link:hover .go { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .menu-foot { gap: 12px; }
+
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ---------- Colour and structure ---------- */
+/* Page openers sit on a tinted block with a fine grid that fades out */
+.hero, .page-head { position: relative; isolation: isolate; background: var(--tint); }
+.hero::before, .page-head::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 56px 56px; background-position: center -1px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .55) 60%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .55) 60%, transparent 100%);
+}
+.page-head { border-bottom: 0; }
+.site-header { background: var(--tint); }
+.site-header.scrolled { background: var(--bg); }
+.stack-map { box-shadow: var(--shadow); border-color: transparent; }
+.map-node rect { fill: var(--surface); }
+
+/* Deep green band: reuses the band styles with green tokens */
+.band.deep { --band: var(--deep); --band-ink: var(--deep-ink); --band-muted: var(--deep-muted); --band-line: var(--deep-line); }
+.band.deep .label::before { background: var(--mint); }
+.band.deep .stat b { color: #fff; }
+
+/* Closing call to action as a solid green panel */
+.cta-block {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: var(--deep); color: var(--deep-ink); border-radius: 20px;
+  padding: clamp(32px, 5.5vw, 72px);
+}
+.cta-block::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: linear-gradient(to left, #000, transparent 70%);
+          mask-image: linear-gradient(to left, #000, transparent 70%);
+}
+.cta-block .note, .band .cta-block .note { color: var(--deep-muted); }
+.cta-block .btn-accent { background: #fff; color: var(--deep); }
+.cta-block .btn-accent:hover { background: var(--mint); }
+.cta-block .btn-outline { color: var(--deep-ink); border-color: rgba(255, 255, 255, .3); }
+.cta-block .btn-outline:hover { border-color: #fff; }
+
+/* Green carried through the details */
+.svc-row .idx, .process li::before, .stage .idx, .values .idx { color: var(--accent-text); font-weight: 600; }
+.ic-lg { background: var(--accent-soft); border-color: transparent; }
+.tag { background: var(--tint); }
+.case-cover { background: var(--tint); }
+.case-cover .metric b { color: var(--accent-text); }
+.logos { background: var(--bg); }
+.plan.featured { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), var(--shadow); }
+.more-card .ic { background: var(--accent-soft); color: var(--accent-text); }
+.pager { background: var(--tint); border-top: 0; }
+.perks { border-top-width: 3px; }
+.map-node.map-core rect { fill: var(--ink); stroke: var(--ink); }
