@@ -5,8 +5,11 @@
     python3 server.py --port 9000
     python3 server.py --host 0.0.0.0   # listen on all interfaces (put HTTPS in front)
 
-Admin password: set CORBEL_ADMIN_PASSWORD, or one is generated on first run and
-printed once. Its hash is kept in data/admin.json; delete that file to reset.
+Admin login: the default is username "admin", password "admin". Change it before the
+site is public:
+    python3 server.py --set-login      # prompts for a new username and password
+or set CORBEL_ADMIN_USER and CORBEL_ADMIN_PASSWORD in the environment. The saved login
+is kept (password hashed) in data/admin.json; delete that file to go back to the default.
 
 Everything the server writes lives in data/ (form submissions, content backups).
 The admin posts case studies and job openings (build/content/cases.json and roles.json),
@@ -14,6 +17,7 @@ then rebuilds the site. Page wording, layout and service pages are changed in co
 Only the Python standard library is used.
 """
 import argparse
+import getpass
 import hashlib
 import hmac
 import http.server
@@ -105,21 +109,43 @@ def password_hash(pw, salt):
     return hashlib.pbkdf2_hmac("sha256", pw.encode(), bytes.fromhex(salt), 200_000).hex()
 
 
-def setup_password():
-    env = os.environ.get("CORBEL_ADMIN_PASSWORD")
-    cfg_path = DATA / "admin.json"
-    if env:
-        salt = secrets.token_hex(16)
-        return {"salt": salt, "hash": password_hash(env, salt)}, None
-    cfg = read_json(cfg_path, None)
-    if cfg:
-        return cfg, None
-    pw = secrets.token_urlsafe(12)
+DEFAULT_USER = DEFAULT_PASSWORD = "admin"
+
+
+def make_login(user, pw):
     salt = secrets.token_hex(16)
-    cfg = {"salt": salt, "hash": password_hash(pw, salt)}
-    write_json(cfg_path, cfg)
-    os.chmod(cfg_path, 0o600)
-    return cfg, pw
+    return {"user": user, "salt": salt, "hash": password_hash(pw, salt)}
+
+
+def setup_login():
+    """Return (login, is_default). Environment variables win over data/admin.json."""
+    env_user, env_pw = os.environ.get("CORBEL_ADMIN_USER"), os.environ.get("CORBEL_ADMIN_PASSWORD")
+    if env_pw:
+        user = env_user or DEFAULT_USER
+        return make_login(user, env_pw), (user, env_pw) == (DEFAULT_USER, DEFAULT_PASSWORD)
+    cfg = read_json(DATA / "admin.json", None)
+    if not cfg or "user" not in cfg:        # first run, or a file from before usernames existed
+        cfg = make_login(DEFAULT_USER, DEFAULT_PASSWORD)
+        save_login(cfg)
+    is_default = cfg["user"] == DEFAULT_USER and hmac.compare_digest(password_hash(DEFAULT_PASSWORD, cfg["salt"]), cfg["hash"])
+    return cfg, is_default
+
+
+def save_login(cfg):
+    write_json(DATA / "admin.json", cfg)
+    os.chmod(DATA / "admin.json", 0o600)
+
+
+def set_login_interactively():
+    user = input("New admin username: ").strip()
+    pw = getpass.getpass("New admin password: ")
+    if not user or len(pw) < 8:
+        sys.exit("Username is required and the password must be at least 8 characters. Nothing changed.")
+    if getpass.getpass("Repeat password: ") != pw:
+        sys.exit("Passwords did not match. Nothing changed.")
+    DATA.mkdir(exist_ok=True)
+    save_login(make_login(user, pw))
+    print("Admin login saved. Restart the server for it to take effect.")
 
 
 # ---------------------------------------------------------------- validation
@@ -368,11 +394,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if rate_limited("login", self.ip, 5, 60):
             return self.send_json(429, {"error": "Too many attempts. Wait a minute and try again."})
         body = self.read_body() or {}
-        pw = str(body.get("password", ""))
-        cfg = self.server.password
-        if not hmac.compare_digest(password_hash(pw, cfg["salt"]), cfg["hash"]):
+        user, pw = str(body.get("username", "")).strip(), str(body.get("password", ""))
+        cfg = self.server.login
+        # Check both, always hashing, so the response doesn't reveal which one was wrong
+        user_ok = hmac.compare_digest(user.encode(), cfg["user"].encode())
+        pw_ok = hmac.compare_digest(password_hash(pw, cfg["salt"]), cfg["hash"])
+        if not (user_ok and pw_ok):
             time.sleep(0.5)
-            return self.send_json(401, {"error": "Wrong password."})
+            return self.send_json(401, {"error": "Wrong username or password."})
         tok = secrets.token_urlsafe(32)
         sessions[tok] = time.time() + SESSION_HOURS * 3600
         cookie = f"corbel_admin={tok}; Path=/; Max-Age={SESSION_HOURS * 3600}; HttpOnly; SameSite=Strict"
@@ -433,16 +462,20 @@ def main():
     ap = argparse.ArgumentParser(description="Serve the Corbel site and admin.")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--set-login", action="store_true", help="change the admin username and password, then exit")
     args = ap.parse_args()
 
+    if args.set_login:
+        return set_login_interactively()
     DATA.mkdir(exist_ok=True)
-    cfg, generated = setup_password()
+    login, is_default = setup_login()
     srv = http.server.ThreadingHTTPServer((args.host, args.port), Handler)
-    srv.password = cfg
+    srv.login = login
     run_build()
     print(f"Corbel running at http://{args.host}:{args.port}/  (admin: /admin/)", flush=True)
-    if generated:
-        print(f"Admin password (shown once, store it somewhere safe): {generated}", flush=True)
+    if is_default:
+        print('Warning: the admin login is still the default (admin / admin). '
+              'Change it with "python3 server.py --set-login" before sharing the site.', flush=True)
     if not last_build["ok"]:
         print("Warning: the initial build failed:\n" + last_build["log"], flush=True)
     try:
