@@ -92,13 +92,13 @@
   function showLogin() {
     $('#app').hidden = true;
     $('#login').hidden = false;
-    $('#password').focus();
+    $('#username').focus();
   }
   $('#loginForm').addEventListener('submit', async e => {
     e.preventDefault();
     $('#loginErr').textContent = '';
     try {
-      await api('POST', '/api/login', { password: $('#password').value });
+      await api('POST', '/api/login', { username: $('#username').value.trim(), password: $('#password').value });
       $('#password').value = '';
       start();
     } catch (err) { $('#loginErr').textContent = err.message; }
