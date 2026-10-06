@@ -299,7 +299,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         path = unquote(path)
         if path in ("/", ""):
             path = "/index.html"
-        if path in ("/admin", "/admin/"):
+        if path == "/admin":
+            # Redirect so the admin page's relative links (admin.js, admin.css) resolve under /admin/
+            self.send_response(301)
+            self.send_header("Location", "/admin/")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        if path == "/admin/":
             path = "/admin/index.html"
         rel = path.lstrip("/")
         allowed = (re.fullmatch(r"[a-z0-9-]+\.html", rel)
