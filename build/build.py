@@ -9,7 +9,7 @@ Run from anywhere:  python3 build/build.py
   build/pages; their content lives in SERVICE_PAGES and shares one template.
 - {{icon:name}} in a page is replaced with the matching icon from ICONS.
 """
-import re, pathlib
+import html, json, re, pathlib, urllib.parse
 
 SRC = pathlib.Path(__file__).parent / "pages"
 OUT = pathlib.Path(__file__).parent.parent
@@ -228,106 +228,30 @@ def page(name, title, desc, body, scripts):
 # ---------------------------------------------------------------------------
 # Service pages share one template
 # ---------------------------------------------------------------------------
-SERVICE_PAGES = [
-    dict(id="software", noun="software", file="software-development.html", name="Software development",
-         title="Software development | Corbel",
-         desc="Custom platforms, internal tools and iOS and Android apps, built around how your business actually runs.",
-         h1="Software built around how your business actually runs.",
-         lede="Custom platforms and mobile apps for the work off-the-shelf tools can't handle: your approvals, your pricing rules, your operations. You own every line of code from the first commit.",
-         facts=[("Typical length", "3 to 9 months"), ("Starts at", "$18,000"), ("Usual model", "Dedicated team")],
-         deliver=[("Internal platforms", "Operations, finance, logistics and approval workflows with role-based access and full audit trails."),
-                  ("Mobile apps", "iOS and Android from one codebase, with offline sync, push notifications and in-app payments."),
-                  ("SaaS products", "Multi-tenant products with billing, onboarding and admin tooling, built to grow with your customer base."),
-                  ("Legacy modernisation", "Rebuild ageing systems piece by piece while the old one keeps running. No big-bang cut-over.")],
-         fit=["Your team works around your tools instead of with them",
-              "Key processes live in spreadsheets, email threads or one person's head",
-              "You need software you own outright, with code in your own repository",
-              "An off-the-shelf product covers 70% of what you need and the rest is costing you"],
-         stack_label="Typical stack", stack=["TypeScript", "React", "React Native", "Node.js", "Python", ".NET", "PostgreSQL"],
-         steps=[("Discovery", "2 weeks", "Workshops with the people who will use it, a map of your current process, and a prioritised backlog."),
-                ("Prototype", "2 to 3 weeks", "Clickable screens for the riskiest workflows, tested with real users before we write production code."),
-                ("Build in sprints", "2 to 6 months", "Two-week sprints with a demo each time. A staging site you can use from week one."),
-                ("Launch and hand-over", "2 weeks", "Data migration, staff training, documentation and 30 days of free fixes.")],
-         faqs=[("Will we be locked in to Corbel?", "No. The code lives in your repository, uses mainstream technology, and comes with documentation and tests. Several clients have taken our work in-house."),
-               ("Can you build for iOS and Android at the same time?", "Yes. We use React Native or Flutter so one team ships both apps from a single codebase, with native modules where performance needs it."),
-               ("Do you work with our in-house developers?", "Often. We can lead the project and pair with your team, or slot in as extra capacity under your tech lead.")]),
-    dict(id="web", noun="web", file="web-development.html", name="Web development",
-         title="Web development | Corbel",
-         desc="Fast, accessible websites, customer portals and e-commerce that your own team can update.",
-         h1="Websites and portals that load fast and stay easy to change.",
-         lede="Company sites, customer portals and online stores that load in about a second, meet accessibility standards, and can be edited by your own team without calling a developer.",
-         facts=[("Typical length", "6 to 14 weeks"), ("Starts at", "$9,000"), ("Usual model", "Fixed scope")],
-         deliver=[("Company websites", "Content-managed marketing sites with clean structure, strong SEO foundations and analytics set up properly."),
-                  ("Customer portals", "Self-service accounts, order tracking, statements and support, connected to your back-office systems."),
-                  ("E-commerce", "Headless storefronts with local and international payments, inventory sync and fast product pages."),
-                  ("Performance and accessibility audits", "A prioritised report on speed, SEO and WCAG issues, with fixes we make or hand to your team.")],
-         fit=["Your current site is slow on mobile or hard to update",
-              "Customers call or email for information they could look up themselves",
-              "You sell online and need payments, stock and delivery to stay in sync",
-              "You are rebranding and want the site rebuilt properly, not reskinned"],
-         stack_label="Typical stack", stack=["Next.js", "Astro", "Sanity", "WordPress (headless)", "Shopify", "Vercel"],
-         steps=[("Content and structure", "1 to 2 weeks", "Sitemap, page templates and a content plan agreed with your marketing team."),
-                ("Design", "2 to 3 weeks", "Design system and key page designs, reviewed on real devices before build."),
-                ("Build and CMS setup", "3 to 8 weeks", "Pages built against a performance budget, with your team editing content in the CMS as we go."),
-                ("Launch", "1 week", "Redirects, analytics, search console and a launch checklist, then training for your editors.")],
-         faqs=[("Can our marketing team edit the site themselves?", "Yes. Every site comes with a CMS set up around your content, and a training session. Most changes never need a developer."),
-               ("Will we lose our search rankings when we move?", "Not if the move is planned. We map every old URL to a new one, keep metadata, and monitor search console for the first months."),
-               ("Do you design the site as well?", "Yes. Our designers handle the visual design and content structure, or we can work from your agency's designs.")]),
-    dict(id="integrations", noun="integration", file="integrations.html", name="Integrations",
-         title="Integrations | Corbel",
-         desc="Connect payments, mobile money, CRM, ERP and logistics systems so data is entered once and trusted everywhere.",
-         h1="Make the systems you already pay for work as one.",
-         lede="Payments, mobile money, CRM, accounting and logistics tools connected properly. Data is entered once, moves automatically, and failures are caught before your customers notice.",
-         facts=[("Typical length", "4 to 10 weeks"), ("Starts at", "$7,000"), ("Usual model", "Fixed scope")],
-         deliver=[("Payments and mobile money", "M-Pesa, Airtel Money, card and bank integrations with automatic reconciliation and refunds."),
-                  ("CRM and ERP sync", "Two-way sync between Salesforce, HubSpot, SAP Business One, Odoo, QuickBooks and Xero."),
-                  ("APIs and middleware", "Well-documented APIs and integration layers with queues, retries and idempotency built in."),
-                  ("Monitoring and alerting", "Dashboards and alerts for every integration, so a failed sync is fixed in minutes rather than found at month end.")],
-         fit=["Staff copy data between systems by hand every day",
-              "Finance and operations disagree on the numbers",
-              "You are adding a new tool and need it to work with the rest",
-              "An existing integration fails silently and nobody notices until month end"],
-         stack_label="Systems we connect often", stack=["M-Pesa Daraja", "Airtel Money", "Stripe", "Flutterwave", "Salesforce", "HubSpot", "SAP B1", "Odoo", "Xero", "QuickBooks"],
-         steps=[("Systems audit", "1 week", "We document every system, the data that moves between them, and where it breaks today."),
-                ("Integration design", "1 week", "Data mapping, error handling and a test plan, agreed with finance and operations."),
-                ("Build and test", "2 to 6 weeks", "Built against sandbox accounts, then tested with real data in a controlled rollout."),
-                ("Monitor", "Ongoing", "Dashboards and alerts go live with the integration, plus a runbook for your team.")],
-         faqs=[("What if the other system doesn't have an API?", "We have integrated with file exports, email parsing and database replication when there was no API. We will tell you the trade-offs up front."),
-               ("Who maintains the integration after launch?", "Your choice. We hand over documentation and runbooks, or keep it running under a support retainer with alerting."),
-               ("Can you work with our existing vendors?", "Yes. We regularly coordinate with ERP partners and payment providers on your behalf.")]),
-    dict(id="cloud", noun="cloud", file="cloud-solutions.html", name="Cloud solutions",
-         title="Cloud solutions | Corbel",
-         desc="Cloud migration, infrastructure as code, CI/CD and cost reviews on AWS, Azure and Google Cloud.",
-         h1="Infrastructure that is cheaper to run and easier to change.",
-         lede="Move off ageing servers, cut your hosting bill, and ship new releases without holding your breath. Every environment is written down as code, so nothing depends on one person's memory.",
-         facts=[("Typical length", "4 to 12 weeks"), ("Starts at", "$8,000"), ("Usual model", "Fixed scope or retainer")],
-         deliver=[("Cloud migration", "Planned moves from on-site servers or other providers, with rehearsed cut-overs and rollback plans."),
-                  ("Infrastructure as code", "Every environment defined in Terraform, reviewed like application code, and reproducible in an afternoon."),
-                  ("CI/CD and DevOps", "Automated tests and deployments so releasing is routine, not a weekend event."),
-                  ("Cost and security reviews", "Right-sizing, reserved capacity and access audits. Most reviews pay for themselves within three months.")],
-         fit=["Critical systems run on a server in your office",
-              "Your cloud bill keeps growing and nobody is sure why",
-              "Deployments are manual, risky or only one person can do them",
-              "You need to meet a security or data-residency requirement"],
-         stack_label="Platforms and tools", stack=["AWS", "Microsoft Azure", "Google Cloud", "Terraform", "Docker", "Kubernetes", "GitHub Actions"],
-         steps=[("Assessment", "1 to 2 weeks", "An inventory of what you run, what it costs, and a migration or improvement plan with a fixed price."),
-                ("Foundations", "1 to 2 weeks", "Accounts, networking, access control and Terraform set up the right way from the start."),
-                ("Migrate or rebuild", "2 to 6 weeks", "Workloads moved in planned waves, each with a rehearsed cut-over and rollback."),
-                ("Optimise", "Ongoing", "Monthly cost and security reviews, patching and backup restore tests.")],
-         faqs=[("Which cloud provider should we use?", "It depends on your team, existing licences and where your customers are. We work across AWS, Azure and Google Cloud and will recommend one with reasons."),
-               ("Will there be downtime during migration?", "We plan for minimal or zero downtime, with cut-overs rehearsed in advance and scheduled outside your busy hours."),
-               ("Can you reduce our current cloud bill?", "Usually. Clients typically save 20 to 40% through right-sizing, reserved capacity and removing forgotten resources.")]),
-]
+CONTENT = pathlib.Path(__file__).parent / "content"
+
+def load(name):
+    return json.loads((CONTENT / name).read_text())
+
+def esc(text):
+    """Escape admin-entered text for HTML. Apostrophes are left readable."""
+    return html.escape(str(text), quote=False)
+
+def attr(text):
+    return html.escape(str(text), quote=True)
+
+SERVICE_PAGES = load("service-pages.json")
 
 def service_page(s):
-    facts = "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in s["facts"])
-    deliver = "".join(f'<div class="reveal"><h3>{h}</h3><p>{p}</p></div>' for h, p in s["deliver"])
-    fit = "".join(f"<li>{x}</li>" for x in s["fit"])
-    stack = "".join(f'<li class="tag">{x}</li>' for x in s["stack"])
-    steps = "".join(f'<li class="reveal"><h3>{t}</h3><p>{p}</p><span class="dur">{d}</span></li>' for t, d, p in s["steps"])
-    faqs = "".join(f'<details><summary>{q}<span class="pm" aria-hidden="true"></span></summary><div><p>{a}</p></div></details>' for q, a in s["faqs"])
+    facts = "".join(f"<div><dt>{esc(f['label'])}</dt><dd>{esc(f['value'])}</dd></div>" for f in s["facts"])
+    deliver = "".join(f'<div class="reveal"><h3>{esc(d["title"])}</h3><p>{esc(d["text"])}</p></div>' for d in s["deliver"])
+    fit = "".join(f"<li>{esc(x)}</li>" for x in s["fit"])
+    stack = "".join(f'<li class="tag">{esc(x)}</li>' for x in s["stack"])
+    steps = "".join(f'<li class="reveal"><h3>{esc(st["title"])}</h3><p>{esc(st["text"])}</p><span class="dur">{esc(st["duration"])}</span></li>' for st in s["steps"])
+    faqs = "".join(f'<details><summary>{esc(f["q"])}<span class="pm" aria-hidden="true"></span></summary><div><p>{esc(f["a"])}</p></div></details>' for f in s["faqs"])
     others = "".join(f'<li><a class="link-arrow" href="{f}">{n} {ICONS["arrow"]}</a></li>'
                      for i, f, n, _ in SERVICES_MENU if i != s["id"])
+    s = {**s, **{k: esc(s[k]) for k in ("name", "h1", "lede", "stack_label", "noun")}}
     return f'''<header class="page-head">
   <div class="container">
     <nav class="crumbs" aria-label="Breadcrumb"><a href="services.html">Services</a><span aria-hidden="true">/</span><span aria-current="page">{s["name"]}</span></nav>
@@ -438,11 +362,36 @@ PAGES = [
      ["data.js", "main.js", "contact.js"]),
 ]
 
+def roles_html():
+    rows = []
+    for r in load("roles.json"):
+        if not r.get("open", True):
+            continue
+        body = "".join(f"<p>{esc(p)}</p>" for p in r["description"])
+        subject = urllib.parse.quote(r["title"])
+        rows.append(f'''<details class="role-row">
+        <summary><b>{esc(r["title"])}</b><span>{esc(r["team"])}</span><span>{esc(r["location"])}</span><span class="pm" aria-hidden="true"></span></summary>
+        <div class="role-body">
+          <div class="prose">{body}</div>
+          <div class="actions"><a class="btn btn-primary" href="mailto:careers@corbel.example?subject={subject}">Apply by email</a><span class="small muted">{esc(r["type"])} · {esc(r["salary"])}</span></div>
+        </div>
+      </details>''')
+    if not rows:
+        return '<p class="muted">No open roles right now. We still read every speculative application.</p>'
+    return '<div class="roles">\n      ' + "\n      ".join(rows) + '\n    </div>'
+
+# Shared data for the site's scripts (stack map, case studies)
+data = {"services": load("services.json"), "cases": load("cases.json")}
+(OUT / "assets/js/data.js").write_text(
+    "/* Corbel — shared content used by several pages.\n"
+    "   Generated by build/build.py from build/content/*.json. Do not edit by hand. */\n"
+    "window.CORBEL = " + json.dumps(data, indent=2, ensure_ascii=False) + ";\n")
+
 for name, title, desc, scripts in PAGES:
-    body = (SRC / name).read_text()
+    body = (SRC / name).read_text().replace("{{roles}}", roles_html())
     (OUT / name).write_text(page(name, title, desc, body, scripts))
     print("built", name)
 
 for s in SERVICE_PAGES:
-    (OUT / s["file"]).write_text(page(s["file"], s["title"], s["desc"], service_page(s), ["data.js", "main.js"]))
+    (OUT / s["file"]).write_text(page(s["file"], attr(s["title"]), attr(s["desc"]), service_page(s), ["data.js", "main.js"]))
     print("built", s["file"])
